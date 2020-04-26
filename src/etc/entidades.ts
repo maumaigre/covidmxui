@@ -1,5 +1,10 @@
 export default [
     {
+      "CLAVE_ENTIDAD": null,
+      "ENTIDAD_FEDERATIVA": "TODOS",
+      "ABREVIATURA": null
+    },
+    {
       "CLAVE_ENTIDAD": "01",
       "ENTIDAD_FEDERATIVA": "AGUASCALIENTES",
       "ABREVIATURA": "AS"
@@ -158,25 +163,5 @@ export default [
       "CLAVE_ENTIDAD": 32,
       "ENTIDAD_FEDERATIVA": "ZACATECAS",
       "ABREVIATURA": "ZS"
-    },
-    {
-      "CLAVE_ENTIDAD": 36,
-      "ENTIDAD_FEDERATIVA": "ESTADOS UNIDOS MEXICANOS",
-      "ABREVIATURA": "EUM"
-    },
-    {
-      "CLAVE_ENTIDAD": 97,
-      "ENTIDAD_FEDERATIVA": "NO APLICA",
-      "ABREVIATURA": "NA"
-    },
-    {
-      "CLAVE_ENTIDAD": 98,
-      "ENTIDAD_FEDERATIVA": "SE IGNORA",
-      "ABREVIATURA": "SI"
-    },
-    {
-      "CLAVE_ENTIDAD": 99,
-      "ENTIDAD_FEDERATIVA": "NO ESPECIFICADO",
-      "ABREVIATURA": "NE"
     }
 ]

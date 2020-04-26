@@ -1,46 +1,46 @@
 <template>
   <div class="stats">
-    <table>
-      <thead>
-        <tr>
-          <th>Confirmados</th>
-          <th>Fallecidos</th>
-          <th>Total de pruebas</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>
-            {{ countConfirmed }}
-          </td>
-          <td>
-            {{ countDead }}
-          </td>
-          <td>
-            {{ countTotal }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div>
-      <a-select defaultValue="lucy" style="width: 120px" @change="handleChange">
-      <a-select-option value="jack">Jack</a-select-option>
-      <a-select-option value="lucy">Lucy</a-select-option>
-      <a-select-option value="disabled" disabled>Disabled</a-select-option>
-      <a-select-option value="Yiminghe">yiminghe</a-select-option>
-      </a-select>
-      <select>
-        <option
-          v-for="entidad of entidades"
-          v-bind:key="entidad.CLAVE_ENTIDAD">{{entidad.ENTIDAD_FEDERATIVA}}</option>
-      </select>
+    <div class="filter-state">
+      <v-col>
+        <v-select
+          :items="entidades"
+          label="Filtrar por estado"
+          item-text="ENTIDAD_FEDERATIVA"
+          item-value="CLAVE_ENTIDAD"
+          v-model="selectedState"
+        ></v-select>
+      </v-col>
     </div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Confirmados</th>
+            <th>Fallecidos</th>
+            <th>Total de pruebas</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              {{ countConfirmed }}
+            </td>
+            <td>
+              {{ countDead }}
+            </td>
+            <td>
+              {{ countTotal }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch} from 'vue-property-decorator';
 import axios from 'axios';
 
 import entidades from './../etc/entidades'
@@ -50,26 +50,56 @@ export default class Stats extends Vue {
   private countTotal = 0;
   private countConfirmed = 0;
   private countDead = 0;
-  private entidades = entidades;
+  public entidades = entidades;
+  public selectedState = "";
 
   mounted() {
+    this.getStats();
+  }
+
+  getStats() {
     axios.get("https://covidmx.live/api/stats").then(res=>{
       const { Total, Confirmed, Dead } = res.data.count;
       this.countTotal = Total;
       this.countConfirmed = Confirmed;
       this.countDead = Dead;
     });
-    console.log(entidades);
   }
+
+  @Watch('selectedState')
+  onPropertyChanged(value: string) {
+    if (!value) this.getStats();
+    else axios.get(`https://covidmx.live/api/stats?entidad_res=${value}`).then(res=>{
+      const { Total, Confirmed, Dead } = res.data.count;
+      this.countTotal = Total;
+      this.countConfirmed = Confirmed;
+      this.countDead = Dead;
+    });
+  }
+  
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-table{
-  tr th{
-    width: 150px;
+.stats{
+  display: flex;
+  flex-flow: column wrap;
+  align-items: center;
+}
+.table-container {
+  display: flex;
+  justify-content: center;
+  table{
+    tr th{
+      width: 150px;
+    }
   }
+}
+
+.filter-state{
+  width: 80%;
+  padding: 2% 4%;
 }
 
 </style>
