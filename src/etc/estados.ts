@@ -5,47 +5,47 @@ export default [
       "ABREVIATURA": null
     },
     {
-      "CLAVE_ENTIDAD": 1,
+      "CLAVE_ENTIDAD": "01",
       "ENTIDAD_FEDERATIVA": "AGUASCALIENTES",
       "ABREVIATURA": "AGS"
     },
     {
-      "CLAVE_ENTIDAD": 2,
+      "CLAVE_ENTIDAD": "02",
       "ENTIDAD_FEDERATIVA": "BAJA CALIFORNIA",
       "ABREVIATURA": "BC"
     },
     {
-      "CLAVE_ENTIDAD": 3,
+      "CLAVE_ENTIDAD": "03",
       "ENTIDAD_FEDERATIVA": "BAJA CALIFORNIA SUR",
       "ABREVIATURA": "BCS"
     },
     {
-      "CLAVE_ENTIDAD": 4,
+      "CLAVE_ENTIDAD": "04",
       "ENTIDAD_FEDERATIVA": "CAMPECHE",
       "ABREVIATURA": "CAM"
     },
     {
-      "CLAVE_ENTIDAD": 5,
+      "CLAVE_ENTIDAD": "05",
       "ENTIDAD_FEDERATIVA": "COAHUILA",
       "ABREVIATURA": "COA"
     },
     {
-      "CLAVE_ENTIDAD": 6,
+      "CLAVE_ENTIDAD": "06",
       "ENTIDAD_FEDERATIVA": "COLIMA",
       "ABREVIATURA": "COL"
     },
     {
-      "CLAVE_ENTIDAD": 7,
+      "CLAVE_ENTIDAD": "07",
       "ENTIDAD_FEDERATIVA": "CHIAPAS",
       "ABREVIATURA": "CHIAP"
     },
     {
-      "CLAVE_ENTIDAD": 8,
+      "CLAVE_ENTIDAD": "08",
       "ENTIDAD_FEDERATIVA": "CHIHUAHUA",
       "ABREVIATURA": "CHIHU"
     },
     {
-      "CLAVE_ENTIDAD": 9,
+      "CLAVE_ENTIDAD": "09",
       "ENTIDAD_FEDERATIVA": "CIUDAD DE MÉXICO",
       "ABREVIATURA": "CDMX"
     },

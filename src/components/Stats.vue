@@ -35,26 +35,38 @@
         </tbody>
       </table>
     </div>
+
+    <div style="width: 80%;" v-if="stateStats.length">
+      <BarChart :chartData="barChartData"/>
+    </div>
     
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Watch} from 'vue-property-decorator';
+
 import axios from 'axios';
 
 import entidades from './../etc/entidades'
 
-@Component
+import BarChart from './BarChart.vue'
+
+@Component({
+  components: {BarChart}
+})
 export default class Stats extends Vue {
   private countTotal = 0;
   private countConfirmed = 0;
   private countDead = 0;
   public entidades = entidades;
   public selectedState = "";
+  public stateStats: any = [];
+  public barChartData: any = {};
 
   mounted() {
     this.getStats();
+    this.getStateStats();
   }
 
   getStats() {
@@ -63,6 +75,31 @@ export default class Stats extends Vue {
       this.countTotal = Total;
       this.countConfirmed = Confirmed;
       this.countDead = Dead;
+    });
+  }
+
+  getStateStats() {
+    axios.get(`https://covidmx.live/api/stateStats?order=desc`).then(res=>{
+      this.stateStats = res.data;
+
+
+      const labels = this.stateStats.map((stateStat: any) =>{
+        const entidad = entidades.find(entidad=>{
+          return entidad.CLAVE_ENTIDAD == stateStat.EntidadRes;
+        });
+        return entidad ? entidad["ABREVIATURA"] : "";
+      });
+
+      this.barChartData = {
+        labels,
+        datasets: [
+            {
+                label: "Casos confirmados",
+                backgroundColor: "#52b1b8",
+                data: [...this.stateStats.map((stat: any) => stat.Casos)]
+            }
+        ]
+      }
     });
   }
 
@@ -76,6 +113,7 @@ export default class Stats extends Vue {
       this.countDead = Dead;
     });
   }
+  
   
 }
 </script>
