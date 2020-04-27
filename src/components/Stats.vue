@@ -29,15 +29,31 @@
               {{ countDead }}
             </td>
             <td>
-              {{ countTotal }}
+              {{ countTested }}
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <div style="width: 80%;" v-if="stateStats.length">
+    <v-select
+      :items="selectedFilterOptions"
+      label="Filtrar por resultado"
+      v-model="selectedFilter"
+    ></v-select>
+
+    <div style="width: 80%;" v-if="selectedChart == 'stateBar' && stateStats.length">
       <BarChart :chartData="barChartData"/>
+      <div class="next-chart">
+        <v-btn @click="selectedChart = 'dailyLine'" outlined color="indigo">Sig. gráf.</v-btn>
+      </div>
+    </div>
+
+    <div style="width: 80%;" v-if="selectedChart == 'dailyLine' && dailyNewStats.length">
+      <BarChart :chartData="lineChartData"/>
+      <div class="next-chart">
+        <v-btn @click="selectedChart = 'stateBar'" outlined color="indigo">Sig. gráf.</v-btn>
+      </div>
     </div>
     
   </div>
@@ -56,23 +72,34 @@ import BarChart from './BarChart.vue'
   components: {BarChart}
 })
 export default class Stats extends Vue {
-  private countTotal = 0;
+  private countTested = 0;
   private countConfirmed = 0;
   private countDead = 0;
   public entidades = entidades;
   public selectedState = "";
   public stateStats: any = [];
   public barChartData: any = {};
+  public lineChartData: any = {};
+  public dailyNewStats: any = {};
+
+  public selectedChart = "stateBar";
+  public selectedChartOptions = ["stateBar", "dailyLine"]
+
+
+  public selectedFilter = "Confirmados";
+  public selectedFilterOptions = ["Confirmados", "Fallecidos"]
+  
 
   mounted() {
     this.getStats();
     this.getStateStats();
+    this.getDailyNewStats();
   }
 
   getStats() {
     axios.get("https://covidmx.live/api/stats").then(res=>{
-      const { Total, Confirmed, Dead } = res.data.count;
-      this.countTotal = Total;
+      const { Tested, Confirmed, Dead } = res.data.count;
+      this.countTested = Tested;
       this.countConfirmed = Confirmed;
       this.countDead = Dead;
     });
@@ -94,9 +121,28 @@ export default class Stats extends Vue {
         labels,
         datasets: [
             {
-                label: "Casos confirmados",
+                label: this.selectedFilter === "Confirmados" ? "Casos confirmados" : "Fallecidos",
                 backgroundColor: "#52b1b8",
-                data: [...this.stateStats.map((stat: any) => stat.Casos)]
+                data: [...this.stateStats.map((stat: any) => this.selectedFilter === "Confirmados" ? stat.Confirmados : stat.Fallecidos)]
+            }
+        ]
+      }
+    });
+  }
+
+  getDailyNewStats() {
+    axios.get("https://covidmx.live/api/dailyNewStats").then(res=>{
+      this.dailyNewStats = res.data;
+      this.lineChartData = {
+        labels: this.dailyNewStats.map((stat: any) => {
+          const date = stat.FechaIngreso.split("-")
+          return `${date[1]}/${date[2]}`
+        }),
+        datasets: [
+            {
+                label: this.selectedFilter === "Confirmados" ? "Nuevos casos confirmados por día" : "Nuevos fallecidos por día",
+                backgroundColor: "#52a1f8",
+                data: [...this.dailyNewStats.map((stat: any) => this.selectedFilter === "Confirmados" ? stat.NewConfirmed : stat.NewDead)]
             }
         ]
       }
@@ -104,14 +150,20 @@ export default class Stats extends Vue {
   }
 
   @Watch('selectedState')
-  onPropertyChanged(value: string) {
+  onSelectedStateChanged(value: string) {
     if (!value) this.getStats();
     else axios.get(`https://covidmx.live/api/stats?entidad_res=${value}`).then(res=>{
-      const { Total, Confirmed, Dead } = res.data.count;
-      this.countTotal = Total;
+      const { Tested, Confirmed, Dead } = res.data.count;
+      this.countTested = Tested;
       this.countConfirmed = Confirmed;
       this.countDead = Dead;
     });
+  }
+
+  @Watch('selectedFilter')
+  onSelectedFilterChanged(value: string) {
+    this.getStateStats();
+    this.getDailyNewStats();
   }
   
   
@@ -128,6 +180,7 @@ export default class Stats extends Vue {
 .table-container {
   display: flex;
   justify-content: center;
+  margin-bottom: 2%;
   table{
     tr th{
       width: 150px;
@@ -138,6 +191,10 @@ export default class Stats extends Vue {
 .filter-state{
   width: 80%;
   padding: 2% 4%;
+}
+
+.next-chart{
+  margin-top: 2%;
 }
 
 </style>
