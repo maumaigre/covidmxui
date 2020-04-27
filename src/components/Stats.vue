@@ -1,17 +1,16 @@
 <template>
   <div class="stats">
     <div class="filter-state">
-      <v-col>
-        <v-select
-          :items="entidades"
-          label="Filtrar por estado"
-          item-text="ENTIDAD_FEDERATIVA"
-          item-value="CLAVE_ENTIDAD"
-          v-model="selectedState"
-        ></v-select>
-      </v-col>
     </div>
     <div class="table-container">
+      <v-select
+        style="height: 60px;"
+        :items="entidades"
+        label="Filtrar por estado"
+        item-text="ENTIDAD_FEDERATIVA"
+        item-value="CLAVE_ENTIDAD"
+        v-model="selectedState"
+      ></v-select>
       <table>
         <thead>
           <tr>
@@ -35,25 +34,23 @@
         </tbody>
       </table>
     </div>
-
+    
     <v-select
       :items="selectedFilterOptions"
       label="Filtrar por resultado"
       v-model="selectedFilter"
-    ></v-select>
+    ></v-select> 
+    <v-btn outlined @click="changeGraph">Sig grafica</v-btn>
 
-    <div style="width: 80%;" v-if="selectedChart == 'stateBar' && stateStats.length">
-      <BarChart :chartData="barChartData"/>
-      <div class="next-chart">
-        <v-btn @click="selectedChart = 'dailyLine'" outlined color="indigo">Sig. gráf.</v-btn>
+    <div style="display: flex; align-items: center; justify-content: center; position: relative; width: 100%;">
+      <div style="width: 80%;" v-if="selectedChart == 'stateBar' && stateStats.length">
+        <BarChart :chartData="barChartData"/>
       </div>
-    </div>
 
-    <div style="width: 80%;" v-if="selectedChart == 'dailyLine' && dailyNewStats.length">
-      <BarChart :chartData="lineChartData"/>
-      <div class="next-chart">
-        <v-btn @click="selectedChart = 'stateBar'" outlined color="indigo">Sig. gráf.</v-btn>
+      <div style="width: 80%;" v-if="selectedChart == 'dailyLine' && dailyNewStats.length">
+        <LineChart :chartData="lineChartData"/>
       </div>
+      
     </div>
     
   </div>
@@ -67,9 +64,10 @@ import axios from 'axios';
 import entidades from './../etc/entidades'
 
 import BarChart from './BarChart.vue'
+import LineChart from './LineChart.vue'
 
 @Component({
-  components: {BarChart}
+  components: {BarChart, LineChart}
 })
 export default class Stats extends Vue {
   private countTested = 0;
@@ -82,7 +80,7 @@ export default class Stats extends Vue {
   public lineChartData: any = {};
   public dailyNewStats: any = {};
 
-  public selectedChart = "stateBar";
+  public selectedChart = "dailyLine";
   public selectedChartOptions = ["stateBar", "dailyLine"]
 
 
@@ -103,6 +101,16 @@ export default class Stats extends Vue {
       this.countConfirmed = Confirmed;
       this.countDead = Dead;
     });
+  }
+
+  changeGraph() {
+    const selectedIndex = this.selectedChartOptions.findIndex(r=>r==this.selectedChart)
+
+    if (this.selectedChartOptions[selectedIndex +1 ] ){
+      this.selectedChart = this.selectedChartOptions[selectedIndex + 1];
+    } else{
+      this.selectedChart = this.selectedChartOptions[0];
+    }
   }
 
   getStateStats() {
@@ -141,8 +149,9 @@ export default class Stats extends Vue {
         datasets: [
             {
                 label: this.selectedFilter === "Confirmados" ? "Nuevos casos confirmados por día" : "Nuevos fallecidos por día",
-                backgroundColor: "#52a1f8",
-                data: [...this.dailyNewStats.map((stat: any) => this.selectedFilter === "Confirmados" ? stat.NewConfirmed : stat.NewDead)]
+                backgroundColor: "red",
+                fill: false,
+                data: this.dailyNewStats.map((stat: any) => this.selectedFilter === "Confirmados" ? stat.NewConfirmed : stat.NewDead)
             }
         ]
       }
@@ -190,11 +199,11 @@ export default class Stats extends Vue {
 
 .filter-state{
   width: 80%;
-  padding: 2% 4%;
+  padding: 1% 4%;
 }
 
 .next-chart{
-  margin-top: 2%;
+  margin-top: 1.5%;
 }
 
 </style>

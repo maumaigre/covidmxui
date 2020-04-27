@@ -32,7 +32,7 @@ export default {
   justify-content: center;
   display: flex;
   align-items: center;
-  a{
+  a:not(:first-child){
     margin-left: 5%;
   }
 }
